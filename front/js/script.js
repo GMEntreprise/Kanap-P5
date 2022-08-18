@@ -1,13 +1,12 @@
 // // Retrieving items from the API
 
-let url = fetch("http://localhost:3000/api/products");
-url
+let url = fetch("http://localhost:3000/api/products")
   .then((response) => response.json())
   .then((response) => {
     getArticles(response);
   })
   .catch((error) => {
-    getArticles(error);
+    console.log("Error : " + error);
   });
 
 // browse and display sofa
@@ -22,7 +21,7 @@ const getArticles = (articles) => {
     productLink.href = "./product.html?id=" + article._id;
     // Insertion element "article"
     let productArticle = document.createElement("article");
-    productArticle.classList.add("Hello");
+
     // Insertion IMG
     let productIMG = document.createElement("img");
     productIMG.src = article.imageUrl;

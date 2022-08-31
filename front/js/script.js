@@ -1,6 +1,6 @@
 // // Retrieving items from the API
 
-let url = fetch("http://localhost:3000/api/products")
+fetch("http://localhost:3000/api/products/")
   .then((response) => response.json())
   .then((response) => {
     getArticles(response);

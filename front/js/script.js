@@ -6,6 +6,9 @@ fetch("http://localhost:3000/api/products/")
     getArticles(response);
   })
   .catch((error) => {
+    alert(
+      `An error has occurred and is not displaying the products in our catalog. We apologize for this error`
+    );
     console.log("Error : " + error);
   });
 

@@ -66,21 +66,11 @@ function addToCart(article) {
     // Take Element
     const color = document.getElementById("colors").value;
     const quantity = document.getElementById("quantity").value;
-
-    //  Check cart
-    if (color == null || color === "" || quantity == null || quantity == 0) {
-      alert("Please select a color and quantity");
-      return;
-    }
-    if (quantity > 100) {
-      alert("Please, note that you can't oder more than 100 Canape");
-      return;
-    }
     // Recovering the options of the item to add to the cart
     const optionProduct = {
       idProduct: id,
       colorProduct: color,
-      quantityProduct: Number(quantity),
+      quantityProduct: quantity,
       priceProduct: article.price,
       nameProduct: article.name,
       descriptionProduct: article.description,
@@ -88,53 +78,68 @@ function addToCart(article) {
       altImgProduct: article.altTxt,
     };
 
-    //Initialisation LocalStorage
+    const popupConfirmation = () => {
+      if (
+        window.confirm(`Your order of ${quantity} ${article.name} ${color} is added to the cart
+        To view your cart, click on OK`)
+      )
+        window.location.href = "cart.html";
+      {
+      }
+    };
 
-    localStorage.setItem(id, JSON.stringify(optionProduct));
+    // //Initialisation LocalStorage
 
-    window.location.href = "cart.html";
+    const tableauLocalStorage = JSON.parse(localStorage.getItem("products"));
 
-    // const popupConfirmation = () => {
-    //   if (
-    //     window.confirm(`Your order of ${quantity} ${article.name} ${color} is added to the cart
-    // To view your cart, click on OK`)
-    //   )
-    //     window.location.href = "cart.html";
-    //   {
-    //   }
-    // };
+    // Si aucune couleur et aucune quantité ne sont saisies, afficher un message d'alert.
+    if (Number(quantity) <= 0 || color === "") {
+      return alert("Please select a color and quantity.");
+    }
 
-    // if (productLocalStorage) {
-    //   //Import to the localStorage
-    //   //If the basket already contains at least 1 item
-    //   let resultFind = productLocalStorage.find((element) => {
-    //     element.idProduct === idProduct && element.colorProduct === color;
-    //     popupConfirmation();
-    //   });
-    // }
-    //   // If the ordered product is already in the cart
-    //   if (resultFind) {
-    //     let newQuantity =
-    //       parseInt(optionProduct.quantityProduct) +
-    //       parseInt(resultFind.quantityProduct);
-    //     resultFind.quantityProduct = newQuantity;
-    //     localStorage.setItem("id", JSON.stringify(productLocalStorage));
-    //     console.table(productLocalStorage);
-    //     popupConfirmation();
-    //     // If the ordered product is not in the cart
-    //   } else {
-    //     productLocalStorage.push(optionProduct);
-    //     localStorage.setItem("id", JSON.stringify(productLocalStorage));
-    //     console.table(productLocalStorage);
-    //     popupConfirmation();
-    //   }
-    //   // If the basket is empty
-    // } else {
-    //   productLocalStorage = [];
-    //   productLocalStorage.push(optionProduct);
-    //   localStorage.setItem("id", JSON.stringify(productLocalStorage));
-    //   console.table(productLocalStorage);
-    //   popupConfirmation();
-    // }
+    // Si le local storage est vide, créer un tableau vide et mettre un produit dans le local storage.
+    if (tableauLocalStorage === null) {
+      const kanapsInfos = [];
+
+      kanapsInfos.push(optionProduct);
+      popupConfirmation();
+
+      return localStorage.setItem("products", JSON.stringify(kanapsInfos));
+    }
+
+    /* La methode array.some() renvoit un booléen true/false, si l'assertion entrée est vraie ou fausse,
+           on va voir si le produit choisi par l'utilisateur est deja dans le localStorage ou pas.*/
+
+    const isInsideLocalStorage = tableauLocalStorage.some((kanap) => {
+      return kanap.idProduct === id && kanap.colorProduct === color;
+    });
+
+    // Si le produit ne se trouve dans le local storage, je le rajoute.
+
+    if (isInsideLocalStorage === false) {
+      tableauLocalStorage.push(optionProduct);
+      popupConfirmation();
+
+      return localStorage.setItem(
+        "products",
+        JSON.stringify(tableauLocalStorage)
+      );
+    }
+
+    // La méthode map() crée un nouveau tableau avec les résultats de l'appel d'une fonction fournie sur chaque élément du tableau appelant.
+    // Si le produit est identique, j'additionne les quantités.
+    const updateTableauLocalStorage = tableauLocalStorage.map((kanap) => {
+      if (kanap.colorProduct === color) {
+        kanap.quantityProduct =
+          Number(kanap.quantityProduct) + Number(quantity);
+      }
+      popupConfirmation();
+      return kanap;
+    });
+
+    return localStorage.setItem(
+      "products",
+      JSON.stringify(updateTableauLocalStorage)
+    );
   });
 }

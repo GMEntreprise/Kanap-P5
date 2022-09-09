@@ -1,31 +1,18 @@
 //Initialisation LocalStorage----------------------
-fetch("");
-const cart = [];
+let productLocalStorage = JSON.parse(localStorage.getItem("products"));
+console.table(productLocalStorage);
 const positionEmptyCart = document.querySelector("#cart__items");
-// Returns the length of the locals
-const productLocalStorage = localStorage.length;
-getElement();
 
-// To get all the keys
-function getElement() {
-  console.log(`Numner of items : ${productLocalStorage}`);
-  // Create a while for get key
-  for (let i = 0; i < productLocalStorage; i++) {
-    const item = localStorage.getItem(localStorage.key(i));
-    const itemObject = JSON.parse(item);
-    cart.push(itemObject);
-  }
+// fetch(`http://localhost:3000/api/products/`);
 
-  console.log(cart);
-}
-
+// Get element---------------------------------------
 const getCart = () => {
   // If the cart empty
   if (productLocalStorage === null || productLocalStorage == 0) {
     const emptyCart = `<p> Votre panier est vide </p>`;
     positionEmptyCart.innerHTML = emptyCart;
   } else {
-    for (let product of cart) {
+    for (let product of productLocalStorage) {
       // Inserting the "article" element
       let productArticle = document.createElement("article");
       document.querySelector("#cart__items").appendChild(productArticle);
@@ -134,7 +121,8 @@ const getTotals = () => {
   totalPrice = 0;
 
   for (let i = 0; i < myLength; i++) {
-    totalPrice += elemsQtt[i].valueAsNumber * cart[i].priceProduct;
+    totalPrice +=
+      elemsQtt[i].valueAsNumber * productLocalStorage[i].priceProduct;
   }
 
   let productTotalPrice = document.getElementById("totalPrice");
@@ -144,106 +132,65 @@ const getTotals = () => {
 getTotals();
 
 //---Function Recalculates the total quantity of items in the cart, when changing the quantity or deleting an item---
-// const recalculTotalPrice = () => {
-//   let newTotalPrice = 0;
-//   for (const item of cart) {
-//     const idProductsLocalStorage = item.idProduct;
-//     const quantityProductsLocalStorage = item.quantityProduct;
-//     // console.log(`id product is : ${idProductsLocalStorage}`);
 
-//     const findProducts = cart.find(
-//       (element) => element.idProduct === idProductsLocalStorage
-//     );
-
-//     if (findProducts) {
-//       const newTotalProductPriceCart =
-//         findProducts.priceProduct * quantityProductsLocalStorage;
-//       newTotalPrice += newTotalProductPriceCart;
-
-//       // console.log("New Total price : ", newTotalPrice);
-//     }
-//     document.getElementById("totalPrice").innerHTML = newTotalPrice;
-//   }
-// };
-// recalculTotalPrice();
 //----------------------------------Function Modify the quantity of an item in the cart--------------------------------------------------
-const changeQuantity = () => {
-  // Select the html element (input) in which the quantity is modified
-  let changeQuantity = document.querySelectorAll(".itemQuantity");
 
-  changeQuantity.forEach((item) => {
-    //Listen to the change on the "itemQuantity" input
-    item.addEventListener("change", (event) => {
+// Modification d'une quantité de produit
+const modifyQtt = () => {
+  let qttModif = document.querySelectorAll(".itemQuantity");
+
+  for (let k = 0; k < qttModif.length; k++) {
+    qttModif[k].addEventListener("change", (event) => {
       event.preventDefault();
-      choiceQuantity = Number(item.value);
-      // console.log(choiceQuantity);
 
-      // We point to the hierarchical parent <item> of the input "itemQuantity"
-      let myArticle = item.closest("article");
-      // console.log(myArticle);
+      //Selection de l'element à modifier en fonction de son id ET sa couleur
 
-      // We retrieve in the localStorage the element (same id and same color) whose quantity we want to modify
-      let selectMyArticleInLocalStorage = cart.find(
-        (element) =>
-          element.idProduct === myArticle.dataset.id &&
-          element.colorProduct === myArticle.dataset.color
+      let quantityModif = productLocalStorage[k].quantityProduct;
+      let qttModifValue = qttModif[k].valueAsNumber;
+      const resultFind = productLocalStorage.find(
+        (el) => el.qttModifValue !== quantityModif
       );
+      console.log(`The previous quantity : ${quantityModif}`);
+      console.log(` The current quantity is :  ${qttModifValue}`);
 
-      // If the quantity is between 1 and 100 and it is an integer,...
-      //...we update the quantity in the localStorage and the DOM
-      if (
-        (choiceQuantity) =>
-          0 && choiceQuantity <= 100 && Number.isInteger(choiceQuantity)
-      ) {
-        parseChoiceQuantity = parseInt(choiceQuantity);
-        selectMyArticleInLocalStorage.quantityProduct = parseChoiceQuantity;
-        localStorage.setItem(
-          "produit",
-          JSON.stringify(selectMyArticleInLocalStorage)
-        );
-      }
+      resultFind.quantityProduct = qttModifValue;
+      productLocalStorage[k].quantityProduct = resultFind.quantityProduct;
 
-      // And, we recalculate the quantity and the total price of the basket
-      getTotals();
+      localStorage.setItem("products", JSON.stringify(productLocalStorage));
+      console.log(resultFind);
 
-      console.table(selectMyArticleInLocalStorage);
+      // refresh rapide
+      location.reload();
     });
-  });
+  }
 };
-changeQuantity();
+modifyQtt();
 
 //----------------------------------Function Delete item from cart-----------------------------------------
 
 const deleteProduct = () => {
-  let selectDelete = document.querySelectorAll(".deleteItem");
-  for (let removeProduct of selectDelete) {
-    removeProduct.addEventListener("click", (event) => {
+  let btnRemove = document.querySelectorAll(".deleteItem");
+  for (let j = 0; j < btnRemove.length; j++) {
+    btnRemove[j].addEventListener("click", (event) => {
       event.preventDefault();
 
-      // We point to the hierarchical parent <article> of the "delete" link
-      let myArticle = removeProduct.closest("article");
-      console.log(myArticle);
+      let idDelete = productLocalStorage[j].idProduct;
+      let colorDelete = productLocalStorage[j].colorProduct;
+
+      productLocalStorage = productLocalStorage.filter(
+        (item) => item.id !== idDelete && item.colorProduct !== colorDelete
+      );
+      localStorage.setItem("products", JSON.stringify(productLocalStorage));
+
+      //Alerte delete product and refresh
+      alert("This product has been removed from your cart");
+      location.reload();
+      console.log(idDelete);
+      console.log(colorDelete);
     });
   }
 };
 deleteProduct();
-
-// Create loop forEach
-// const deleteProduct = () => {
-//   let selectDelete = document.querySelectorAll(".deleteItem");
-//   selectDelete.forEach((removeProduct) => {
-//     removeProduct.addEventListener("click", (event) => {
-//       event.preventDefault();
-
-//       // We point to the hierarchical parent <article> of the "delete" link
-//       let myArticle = removeProduct.closest("article");
-//       console.log(myArticle);
-
-//       // we filter the elements of the localStorage to keep only those which are different from the element we delete
-//     });
-//   });
-// };
-// deleteProduct();
 
 // altImgProduct: "Photo d'un canapé bleu, deux places"
 // ​​

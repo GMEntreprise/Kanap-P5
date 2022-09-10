@@ -132,8 +132,6 @@ const getTotals = () => {
 };
 getTotals();
 
-//---Function Recalculates the total quantity of items in the cart, when changing the quantity or deleting an item---
-
 //----------------------------------Function Modify the quantity of an item in the cart--------------------------------------------------
 
 // Modification d'une quantité de produit
@@ -158,10 +156,9 @@ const modifyQtt = () => {
       productLocalStorage[k].quantityProduct = resultFind.quantityProduct;
 
       localStorage.setItem("products", JSON.stringify(productLocalStorage));
-      console.log(resultFind);
 
       // refresh rapide
-      location.reload();
+      // location.reload();
     });
   }
 };
@@ -254,7 +251,6 @@ const getForm = () => {
     // Récupération de la balise "p" nextElementSibling
     let lastNameErrorMsg = inputLastName.nextElementSibling;
 
-    console.log(inputLastName.value);
     if (charRegExp.test(inputLastName.value)) {
       lastNameErrorMsg.innerHTML = "";
     } else {
@@ -311,11 +307,50 @@ const postForm = () => {
   // Listen the cart
   btnCommand.addEventListener("click", (event) => {
     //Récupération des coordonnées du formulaire client
+
+    event.preventDefault();
     let inputName = document.getElementById("firstName");
     let inputLastName = document.getElementById("lastName");
     let inputAdress = document.getElementById("address");
     let inputCity = document.getElementById("city");
     let inputMail = document.getElementById("email");
+
+    // Constituer un objet contact (à partir des données du formulaire) et un tableau de produits.
+
+    let productsId = [];
+
+    for (let i = 0; i < productLocalStorage.length; i++) {
+      productsId.push(productLocalStorage[i].idProduct);
+    }
+
+    const order = {
+      contact: {
+        firstName: inputName.value,
+        lastName: inputLastName.value,
+        address: inputAdress.value,
+        city: inputCity.value,
+        email: inputMail.value,
+      },
+      products: productsId,
+    };
+
+    fetch(`http://localhost:3000/api/products/order`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+      },
+      body: JSON.stringify(order),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((result) => {
+        localStorage.clear();
+        window.location.href = `confirmation.html?orderid=${result.orderId}`;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   });
 };
 postForm();

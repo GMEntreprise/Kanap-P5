@@ -2,7 +2,6 @@
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const id = urlParams.get("id");
-console.log(id);
 
 // Send a request to the back-end to retrieve the product info for the id retrieved in the url
 fetch(`http://localhost:3000/api/products/${id}`)

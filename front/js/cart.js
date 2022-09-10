@@ -113,6 +113,7 @@ const getTotals = () => {
   for (let i = 0; i < myLength; i++) {
     totalQtt += elemsQtt[i].valueAsNumber;
   }
+
   let productTotalQuantity = document.getElementById("totalQuantity");
   productTotalQuantity.innerHTML = totalQtt;
   console.log(`You current quantity : ${totalQtt}`);
@@ -174,9 +175,11 @@ const deleteProduct = () => {
     btnRemove[j].addEventListener("click", (event) => {
       event.preventDefault();
 
+      //Selection of the element to delete according to its id AND its color
       let idDelete = productLocalStorage[j].idProduct;
       let colorDelete = productLocalStorage[j].colorProduct;
 
+      // Ont filtre dans le localStorage si ID est different des autres id
       productLocalStorage = productLocalStorage.filter(
         (item) => item.id !== idDelete && item.colorProduct !== colorDelete
       );
@@ -185,25 +188,134 @@ const deleteProduct = () => {
       //Alerte delete product and refresh
       alert("This product has been removed from your cart");
       location.reload();
-      console.log(idDelete);
-      console.log(colorDelete);
     });
   }
 };
 deleteProduct();
 
-// altImgProduct: "Photo d'un canapé bleu, deux places"
-// ​​
-// colorProduct: "Blue"
-// ​​
-// descriptionProduct: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-// ​​
-// idProduct: "107fb5b75607497b96722bda5b504926"
-// ​​
-// imgProduct: "http://localhost:3000/images/kanap01.jpeg"
-// ​​
-// nameProduct: "Kanap Sinopé"
-// ​​
-// priceProduct: 1849
-// ​​
-// quantityProduct: 2
+//Instauration form with regex---------------------------------------
+
+const getForm = () => {
+  let form = document.querySelector(".cart__order__form");
+
+  //Création des expressions régulières permet de tester la présence de certain caractère
+
+  let emailRegExp = new RegExp(
+    "^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$"
+  );
+  let charRegExp = new RegExp("^[a-zA-Z ,.'-]+$");
+  let addressRegExp = new RegExp(
+    "^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+"
+  );
+
+  // Listen to the change of the firstName
+  form.firstName.addEventListener("change", function () {
+    validFirstName(this);
+  });
+
+  // Listen to the change of the lastName
+  form.lastName.addEventListener("change", function () {
+    validLasttName(this);
+  });
+
+  // Listen to the change of the Adress
+  form.address.addEventListener("change", function () {
+    validAddress(this);
+  });
+
+  // Listen to the change of the City
+  form.city.addEventListener("change", function () {
+    validCity(this);
+  });
+
+  // Listen to the change of the Email
+  form.email.addEventListener("change", function () {
+    validEmail(this);
+  });
+
+  // Valid firstName----------------------
+
+  const validFirstName = (inputFirstName) => {
+    // nextElementSibling nous permet d'attraper la balise suivante
+    let firstNameErrorMsg = inputFirstName.nextElementSibling;
+
+    console.log(firstNameErrorMsg);
+    if (charRegExp.test(inputFirstName.value)) {
+      firstNameErrorMsg.innerHTML = "";
+    } else {
+      firstNameErrorMsg.innerHTML = "Veuillez renseigner ce champ.";
+      firstNameErrorMsg.style.color = "red";
+    }
+  };
+
+  // Valid lastName---------------------
+
+  const validLasttName = (inputLastName) => {
+    // Récupération de la balise "p" nextElementSibling
+    let lastNameErrorMsg = inputLastName.nextElementSibling;
+
+    console.log(inputLastName.value);
+    if (charRegExp.test(inputLastName.value)) {
+      lastNameErrorMsg.innerHTML = "";
+    } else {
+      lastNameErrorMsg.innerHTML = "Veuillez renseigner ce champ.";
+      firstNameErrorMsg.style.color = "red";
+    }
+  };
+
+  // Valid Address------------------
+
+  const validAddress = (inputAddress) => {
+    let addressErrorMsg = inputAddress.nextElementSibling;
+
+    if (addressRegExp.test(inputAddress.value)) {
+      addressErrorMsg.innerHTML = "";
+    } else {
+      addressErrorMsg.innerHTML = "Veuillez renseigner ce champ.";
+      addressErrorMsg.style.color = "red";
+    }
+  };
+  // Valid City------------------------
+
+  const validCity = (inputCity) => {
+    let cityErrorMsg = inputCity.nextElementSibling;
+
+    if (charRegExp.test(inputCity.value)) {
+      cityErrorMsg.innerHTML = "";
+    } else {
+      cityErrorMsg.innerHTML = "Veuillez renseigner ce champ.";
+      cityErrorMsg.style.color = "red";
+    }
+  };
+
+  // Valid Email------------------------
+
+  const validEmail = (inputEmail) => {
+    let emailErrorMsg = inputEmail.nextElementSibling;
+
+    if (emailRegExp.test(inputEmail.value)) {
+      emailErrorMsg.innerHTML = "";
+    } else {
+      emailErrorMsg.innerHTML = "Veuillez renseigner votre Email.";
+      emailErrorMsg.style.color = "red";
+    }
+  };
+};
+getForm();
+
+// Envoi des informations
+
+const postForm = () => {
+  const btnCommand = document.getElementById("order");
+
+  // Listen the cart
+  btnCommand.addEventListener("click", (event) => {
+    //Récupération des coordonnées du formulaire client
+    let inputName = document.getElementById("firstName");
+    let inputLastName = document.getElementById("lastName");
+    let inputAdress = document.getElementById("address");
+    let inputCity = document.getElementById("city");
+    let inputMail = document.getElementById("email");
+  });
+};
+postForm();

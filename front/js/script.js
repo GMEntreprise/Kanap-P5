@@ -2,12 +2,12 @@
 
 fetch("http://localhost:3000/api/products/")
   .then((response) => response.json())
-  .then((response) => {
-    getArticles(response);
+  .then((result) => {
+    getArticles(result);
   })
   .catch((error) => {
     alert(
-      `An error has occurred and is not displaying the products in our catalog. We apologize for this error`
+      `Une erreur s'est produite et ne permet pas d'afficher les produits de notre catalogue. Nous nous excusons pour cette erreur`
     );
     console.log("Error : " + error);
   });

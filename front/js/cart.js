@@ -1,9 +1,7 @@
 //Initialisation LocalStorage----------------------
 let productLocalStorage = JSON.parse(localStorage.getItem("products"));
-console.table(productLocalStorage);
-const positionEmptyCart = document.querySelector("#cart__items");
 
-// fetch(`http://localhost:3000/api/products/`);
+const positionEmptyCart = document.querySelector("#cart__items");
 
 // Get element---------------------------------------
 const getCart = () => {
@@ -108,7 +106,7 @@ const getTotals = () => {
   totalQtt = 0;
 
   // For Each quantity of input
-  // Tant que est inferieur à la longeur de l'input
+  // Tant que i est inferieur à la valeur de l'input/ affiche moi la quantité qui se trouve dans l'input
 
   for (let i = 0; i < myLength; i++) {
     totalQtt += elemsQtt[i].valueAsNumber;
@@ -120,19 +118,19 @@ const getTotals = () => {
 
   // Get the total price‡------------------------------
   totalPrice = 0;
+  // tant que i est inférieur à la longueur de l'input
 
   for (let i = 0; i < myLength; i++) {
     totalPrice +=
       elemsQtt[i].valueAsNumber * productLocalStorage[i].priceProduct;
   }
-
   let productTotalPrice = document.getElementById("totalPrice");
   productTotalPrice.innerHTML = totalPrice;
   console.log(`Your current price : ${totalPrice}`);
 };
 getTotals();
 
-//----------------------------------Function Modify the quantity of an item in the cart--------------------------------------------------
+//----------------------------------Function Modify the quantity of an item in the cart/ Update Price--------------------------------------------------
 
 // Modification d'une quantité de produit
 const modifyQtt = () => {
@@ -149,8 +147,9 @@ const modifyQtt = () => {
       const resultFind = productLocalStorage.find(
         (el) => el.qttModifValue !== quantityModif
       );
-      console.log(`The previous quantity : ${quantityModif}`);
-      console.log(` The current quantity is :  ${qttModifValue}`);
+
+      // console.log(`The previous quantity : ${quantityModif}`);
+      // console.log(` The current quantity is :  ${qttModifValue}`);
 
       resultFind.quantityProduct = qttModifValue;
       productLocalStorage[k].quantityProduct = resultFind.quantityProduct;
@@ -158,7 +157,7 @@ const modifyQtt = () => {
       localStorage.setItem("products", JSON.stringify(productLocalStorage));
 
       // refresh rapide
-      // location.reload();
+      // document.location.reload();
     });
   }
 };
@@ -167,12 +166,14 @@ modifyQtt();
 //----------------------------------Function Delete item from cart-----------------------------------------
 
 const deleteProduct = () => {
+  // On utilise le querySelectorAll car on veut récuperer toute les balise.
   let btnRemove = document.querySelectorAll(".deleteItem");
+
   for (let j = 0; j < btnRemove.length; j++) {
     btnRemove[j].addEventListener("click", (event) => {
       event.preventDefault();
 
-      //Selection of the element to delete according to its id AND its color
+      //Sélection de l'élément à supprimer en fonction de son id ET de sa couleur
       let idDelete = productLocalStorage[j].idProduct;
       let colorDelete = productLocalStorage[j].colorProduct;
 
@@ -182,9 +183,9 @@ const deleteProduct = () => {
       );
       localStorage.setItem("products", JSON.stringify(productLocalStorage));
 
-      //Alerte delete product and refresh
+      //Alerte delete product and refresh Nous permet de actualiser la page rapidement.
       alert("This product has been removed from your cart");
-      location.reload();
+      document.location.reload();
     });
   }
 };
@@ -236,7 +237,6 @@ const getForm = () => {
     // nextElementSibling nous permet d'attraper la balise suivante
     let firstNameErrorMsg = inputFirstName.nextElementSibling;
 
-    console.log(firstNameErrorMsg);
     if (charRegExp.test(inputFirstName.value)) {
       firstNameErrorMsg.innerHTML = "";
     } else {

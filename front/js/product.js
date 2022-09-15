@@ -1,9 +1,9 @@
-// Get the id of the product passed in the url
+// Obtenir l'id du produit passé dans l'url
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const id = urlParams.get("id");
 
-// Send a request to the back-end to retrieve the product info for the id retrieved in the url
+// Envoyez une requête au back-end pour récupérer les informations sur le produit pour l'identifiant récupéré dans l'url.
 fetch(`http://localhost:3000/api/products/${id}`)
   .then((response) => response.json())
   .then((data) => {
@@ -12,17 +12,6 @@ fetch(`http://localhost:3000/api/products/${id}`)
   .catch((error) => {
     console.log("Cant charge API ! ", error);
   });
-
-// .then((response) => {
-//   if (response.ok) {
-//     console.log(response);
-//     response.json().then((data) => {
-//       getPost(data);
-//     });
-//   } else {
-//     console.log("Error can't charge API !");
-//   }
-// });
 
 //   Container
 let divContainer = document.querySelector(".item__img");
@@ -48,6 +37,7 @@ const getPost = (article) => {
 
   //   Create Element Option
   for (color of article.colors) {
+    // console.table(color);
     let select = document.getElementById("colors");
     productColor = document.createElement("option");
     productColor.value = color;
@@ -59,13 +49,15 @@ const getPost = (article) => {
 
 // Gestion Cart
 const button = document.getElementById("addToCart");
+
 function addToCart(article) {
   // Listener Cart with conditions
   button.addEventListener("click", () => {
     // Take Element
     const color = document.getElementById("colors").value;
     const quantity = document.getElementById("quantity").value;
-    // Recovering the options of the item to add to the cart
+
+    // Récupération des options de l'article à ajouter au panier
     const optionProduct = {
       idProduct: id,
       colorProduct: color,
@@ -87,7 +79,12 @@ function addToCart(article) {
       }
     };
 
-    // //Initialisation LocalStorage
+    if (quantity > 100) {
+      alert("You can't drop more than 100 sofas");
+      return;
+    }
+
+    // //Initialisation LocalStorage/On récuperer les données avec JSON.parse()
 
     const tableauLocalStorage = JSON.parse(localStorage.getItem("products"));
 
@@ -96,13 +93,14 @@ function addToCart(article) {
       return alert("Please select a color and quantity.");
     }
 
-    // Si le local storage est vide, créer un tableau vide et mettre un produit dans le local storage.
+    // Si le local storage est vide, créer un tableau vide et mettre un produit dans le local storage./ JSON.stringify va nous transformer un objet on lui met en parametre en string.
     if (tableauLocalStorage === null) {
       const kanapsInfos = [];
 
       kanapsInfos.push(optionProduct);
       popupConfirmation();
 
+      // Nous enregistrons notre clés qui s'appellent "products,"/ nous transformons objet en string
       return localStorage.setItem("products", JSON.stringify(kanapsInfos));
     }
 
@@ -113,7 +111,7 @@ function addToCart(article) {
       return kanap.idProduct === id && kanap.colorProduct === color;
     });
 
-    // Si le produit ne se trouve dans le local storage, je le rajoute.
+    // Si le produit ne se trouve pas dans le local storage, je le rajoute.
 
     if (isInsideLocalStorage === false) {
       tableauLocalStorage.push(optionProduct);

@@ -3,6 +3,15 @@ let productLocalStorage = JSON.parse(localStorage.getItem("products"));
 
 const positionEmptyCart = document.querySelector("#cart__items");
 
+fetch(`http://localhost:3000/api/products`)
+  .then((response) => response.json())
+  .then((data) => {
+    getCart(data);
+  })
+  .catch((error) => {
+    console.log("L'API ne peut pas être chargée ! ", error);
+  });
+
 // Get element---------------------------------------
 const getCart = () => {
   // If the cart empty
@@ -10,13 +19,13 @@ const getCart = () => {
     const emptyCart = `<p> Votre panier est vide </p>`;
     positionEmptyCart.innerHTML = emptyCart;
   } else {
-    for (let product of productLocalStorage) {
+    for (let articles of productLocalStorage) {
       // Inserting the "article" element
       let productArticle = document.createElement("article");
       document.querySelector("#cart__items").appendChild(productArticle);
       productArticle.classList.add("card__items");
-      productArticle.dataset.id = product.idProduct;
-      productArticle.dataset.color = product.colorProduct;
+      productArticle.dataset.id = articles.idProduct;
+      productArticle.dataset.color = articles.colorProduct;
 
       // Inserting the Elément "div Image"
       let productDivImg = document.createElement("div");
@@ -27,8 +36,8 @@ const getCart = () => {
       let productImg = document.createElement("img");
       document.querySelector("#cart__item__img");
       productDivImg.appendChild(productImg);
-      productImg.src = product.imgProduct;
-      productImg.alt = product.altImgProduct;
+      productImg.src = articles.imageUrl;
+      productImg.alt = articles.altTxt;
       // Inserting Elément "div"
       let productItemContent = document.createElement("div");
       productArticle.appendChild(productItemContent);
@@ -41,18 +50,18 @@ const getCart = () => {
       // Inserting title h2
       let productTitle = document.createElement("h2");
       productItemContentDesc.appendChild(productTitle);
-      productTitle.innerHTML = product.nameProduct;
+      productTitle.innerHTML = articles.name;
 
       // Inserting the color
       let productColor = document.createElement("p");
       productItemContentDesc.appendChild(productColor);
-      productColor.innerHTML = product.colorProduct;
+      productColor.innerHTML = articles.colorProduct;
       productColor.style.fontSize = "20px";
 
       // Inserting the price
       let productPrice = document.createElement("p");
       productItemContentDesc.appendChild(productPrice);
-      productPrice.innerHTML = product.priceProduct + " €";
+      productPrice.innerHTML = articles.price + " €";
       // Inserting Elément "div"
       let productItemContentSettings = document.createElement("div");
       productItemContent.appendChild(productItemContentSettings);
@@ -73,7 +82,7 @@ const getCart = () => {
       // Inserting the "Quantity"
       let productQuantity = document.createElement("input");
       productItemContentSettingQuantity.appendChild(productQuantity);
-      productQuantity.value = product.quantityProduct;
+      productQuantity.value = articles.quantityProduct;
       productQuantity.classList.add("itemQuantity");
       productQuantity.setAttribute("type", "number");
       productQuantity.setAttribute("min", "1");
@@ -98,7 +107,7 @@ const getCart = () => {
 
 getCart();
 
-const getTotals = () => {
+const getTotals = (item) => {
   // Get the total quantities----------------------------------------
   let elemsQtt = document.getElementsByClassName("itemQuantity");
   let myLength = elemsQtt.length;
@@ -114,19 +123,18 @@ const getTotals = () => {
 
   let productTotalQuantity = document.getElementById("totalQuantity");
   productTotalQuantity.innerHTML = totalQtt;
-  console.log(`You current quantity : ${totalQtt}`);
+  // console.log(`You current quantity : ${totalQtt}`);
 
   // Get the total price‡------------------------------
   totalPrice = 0;
   // tant que i est inférieur à la longueur de l'input
 
   for (let i = 0; i < myLength; i++) {
-    totalPrice +=
-      elemsQtt[i].valueAsNumber * productLocalStorage[i].priceProduct;
+    totalPrice += elemsQtt[i].valueAsNumber * productLocalStorage[i].price;
   }
   let productTotalPrice = document.getElementById("totalPrice");
   productTotalPrice.innerHTML = totalPrice;
-  console.log(`Your current price : ${totalPrice}`);
+  // console.log(`Your current price : ${totalPrice}`);
 };
 getTotals();
 
@@ -157,7 +165,7 @@ const modifyQtt = () => {
       localStorage.setItem("products", JSON.stringify(productLocalStorage));
 
       // refresh rapide
-      // document.location.reload();
+      document.location.reload();
     });
   }
 };
@@ -184,7 +192,7 @@ const deleteProduct = () => {
       localStorage.setItem("products", JSON.stringify(productLocalStorage));
 
       //Alerte delete product and refresh Nous permet de actualiser la page rapidement.
-      alert("This product has been removed from your cart");
+      alert("Ce produit a été retiré de votre panier");
       document.location.reload();
     });
   }
@@ -315,14 +323,12 @@ const postForm = () => {
     let inputCity = document.getElementById("city");
     let inputMail = document.getElementById("email");
 
-    // Constituer un objet contact (à partir des données du formulaire) et un tableau de produits.
-
     let productsId = [];
-
+    // Obtenir le nombre d'élement stocké dans le localStorage.
     for (let i = 0; i < productLocalStorage.length; i++) {
       productsId.push(productLocalStorage[i].idProduct);
     }
-
+    // Constituer un objet contact (à partir des données du formulaire) et un tableau de produits.
     const order = {
       contact: {
         firstName: inputName.value,
@@ -334,9 +340,11 @@ const postForm = () => {
       products: productsId,
     };
 
+    // On envoie les données vers le back-end/ La method POST nous permet d'envoyé des données/ Requête POST
     fetch(`http://localhost:3000/api/products/order`, {
       method: "POST",
       headers: {
+        // Permet de dire au moment de l'envoie que le content-type c'est du JSON
         "Content-Type": "application/json;charset=utf-8",
       },
       body: JSON.stringify(order),

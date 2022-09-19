@@ -1,16 +1,16 @@
-// Obtenir l'id du produit passé dans l'url
+// Obtenir l'id du produit passé dans l'url/ Je recupère la valeur de mon id=107 donc "107". La méthode URLSearchParams.get()
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const id = urlParams.get("id");
 
-// Envoyez une requête au back-end pour récupérer les informations sur le produit pour l'identifiant récupéré dans l'url.
+// Envoyez une requête au back-end pour récupérer les informations sur le produit pour l'identifiant récupéré dans l'url. Requête GET
 fetch(`http://localhost:3000/api/products/${id}`)
   .then((response) => response.json())
   .then((data) => {
     getPost(data);
   })
   .catch((error) => {
-    console.log("Cant charge API ! ", error);
+    console.log("L'API ne peut pas être chargée ! ", error);
   });
 
 //   Container
@@ -53,44 +53,45 @@ const button = document.getElementById("addToCart");
 function addToCart(article) {
   // Listener Cart with conditions
   button.addEventListener("click", () => {
-    // Take Element
+    // Je recupere la valeur de la couleur et de la quantité.
     const color = document.getElementById("colors").value;
     const quantity = document.getElementById("quantity").value;
 
-    // Récupération des options de l'article à ajouter au panier
+    // Récupération des informations de l'article à ajouter au panier.
     const optionProduct = {
       idProduct: id,
       colorProduct: color,
       quantityProduct: quantity,
-      priceProduct: article.price,
-      nameProduct: article.name,
-      descriptionProduct: article.description,
-      imgProduct: article.imageUrl,
-      altImgProduct: article.altTxt,
+      // priceProduct: article.price,
+      // nameProduct: article.name,
+      // descriptionProduct: article.description,
+      // imgProduct: article.imageUrl,
+      // altImgProduct: article.altTxt,
     };
 
     const popupConfirmation = () => {
       if (
-        window.confirm(`Your order of ${quantity} ${article.name} ${color} is added to the cart
-        To view your cart, click on OK`)
+        window.confirm(`Votre commande de ${quantity} ${article.name} ${color} est ajoutée au panier
+        Pour visualiser votre panier, cliquez sur OK.`)
       )
         window.location.href = "cart.html";
+
       {
       }
     };
 
     if (quantity > 100) {
-      alert("You can't drop more than 100 sofas");
+      alert("Vous ne pouvez pas prendre plus de 100 Canapé ! ");
       return;
     }
 
-    // //Initialisation LocalStorage/On récuperer les données avec JSON.parse()
+    // //Initialisation LocalStorage/On récuperer la clés avec JSON.parse()/ localStorage : Stocke dans le navigateur les information même après qu'il soit fermé
 
     const tableauLocalStorage = JSON.parse(localStorage.getItem("products"));
 
     // Si aucune couleur et aucune quantité ne sont saisies, afficher un message d'alert.
     if (Number(quantity) <= 0 || color === "") {
-      return alert("Please select a color and quantity.");
+      return alert("Veuillez sélectionner une quantité et une couleur.");
     }
 
     // Si le local storage est vide, créer un tableau vide et mettre un produit dans le local storage./ JSON.stringify va nous transformer un objet on lui met en parametre en string.
